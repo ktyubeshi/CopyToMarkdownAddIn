@@ -40,6 +40,16 @@ zipファイルのダウンロード後、展開する前に必ずファイル�
 </span></b>
 ![](docs/images/zip.png)
 
+### CLIからのビルド
+
+MSBuildを使用してソリューションをビルドできます。
+必要なワークロード（Office 開発）を含むVisual Studioがインストールされていることを確認してください。
+
+```powershell
+& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" "CopyFromExcelToMarkdownAddIn\CopyFromExcelToMarkdownAddIn.sln" /t:Build /p:Configuration=Release
+```
+*注: Visual Studioのバージョンやエディションに合わせて、MSBuild.exeへのパスを調整してください。*
+
 ### ライセンス  
 
 個人・商用に関わらず完全に無料でお使いいただけます。  

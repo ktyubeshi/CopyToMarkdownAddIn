@@ -47,3 +47,13 @@ Please install in the next procedure.
 4. Press the OK button to close the property.
 5. Unzip the zip file.  
 6. Run the setup.exe.
+
+### Build from CLI
+
+You can build the solution using MSBuild.
+Ensure you have Visual Studio installed with the necessary workloads (Office Development).
+
+```powershell
+& "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" "CopyFromExcelToMarkdownAddIn\CopyFromExcelToMarkdownAddIn.sln" /t:Build /p:Configuration=Release
+```
+*Note: Adjust the path to MSBuild.exe according to your Visual Studio installation version and edition.*
