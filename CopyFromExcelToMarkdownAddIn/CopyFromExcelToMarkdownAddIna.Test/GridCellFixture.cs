@@ -41,6 +41,7 @@ namespace CopyFromExcelToMarkdownAddIna.Test
         {
             Assert.Equal(Alignment.Left, new GridCell(":-").Alignment);
             Assert.Equal(Alignment.Left, new GridCell(":--").Alignment);
+            Assert.Equal(Alignment.Left, new GridCell(":---").Alignment);
         }
 
         [Fact]
@@ -62,6 +63,7 @@ namespace CopyFromExcelToMarkdownAddIna.Test
         {
             // Test that alignment markers with surrounding spaces are correctly detected
             Assert.True(new GridCell(" :-- ").IsAlignment);
+            Assert.True(new GridCell(" :--- ").IsAlignment); // Example from user's table
             Assert.True(new GridCell(" :-: ").IsAlignment);
             Assert.True(new GridCell(" --: ").IsAlignment);
             Assert.True(new GridCell("  --  ").IsAlignment);
@@ -72,6 +74,7 @@ namespace CopyFromExcelToMarkdownAddIna.Test
         {
             // Test that alignment type is correctly determined even with spaces
             Assert.Equal(Alignment.Left, new GridCell(" :-- ").Alignment);
+            Assert.Equal(Alignment.Left, new GridCell(" :--- ").Alignment); // Example from user's table
             Assert.Equal(Alignment.Center, new GridCell(" :-: ").Alignment);
             Assert.Equal(Alignment.Right, new GridCell(" --: ").Alignment);
             Assert.Equal(Alignment.Undefined, new GridCell("  --  ").Alignment);
