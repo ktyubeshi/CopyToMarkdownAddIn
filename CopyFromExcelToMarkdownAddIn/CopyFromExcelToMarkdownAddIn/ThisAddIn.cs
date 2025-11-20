@@ -127,6 +127,37 @@ namespace CopyFromExcelToMarkdownAddIn
         {
             var cell = (Range)sheet.Cells[row, column];
             var text = textBlock.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                cell.Value2 = string.Empty;
+                return;
+            }
+
+            // Handle Headings
+            if (text.StartsWith("#"))
+            {
+                if (text.StartsWith("# "))
+                {
+                    text = text.Substring(2).Trim();
+                    cell.Font.Size = 18;
+                }
+                else if (text.StartsWith("## "))
+                {
+                    text = text.Substring(3).Trim();
+                    cell.Font.Size = 14;
+                }
+                else if (text.StartsWith("### "))
+                {
+                    text = text.Substring(4).Trim();
+                    cell.Font.Bold = true;
+                }
+            }
+            // Handle Lists
+            else if (text.StartsWith("* ") || text.StartsWith("- ") || text.StartsWith("• "))
+            {
+                text = text.Substring(2).Trim();
+                cell.IndentLevel = 1;
+            }
 
             // Check if the text contains Markdown formatting markers
             if (!System.Text.RegularExpressions.Regex.IsMatch(text, @"(\*|_|~|`)"))
