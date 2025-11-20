@@ -107,7 +107,56 @@ namespace CopyFromExcelToMarkdownAddIn
                 {
                     var cell = row[j];
                     var activeSheetCell =  (Range)activeSheet.Cells[range.Row + i, range.Column + j];
-                    activeSheetCell.Value2 = cell.Value.Replace("<br>", "\n").Replace("<br/>", "\n");
+
+                    // Replace <br> tags with newlines
+                    var baseText = cell.Value.Replace("<br>", "\n").Replace("<br/>", "\n");
+
+                    // Check if the text contains Markdown formatting markers
+                    // If not, skip parsing for better performance
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(baseText, @"(\*|_|~|`)"))
+                    {
+                        activeSheetCell.Value2 = baseText;
+                    }
+                    else
+                    {
+                        // Parse Markdown formatting
+                        var segments = MarkdownInlineParser.Parse(baseText);
+
+                        // 1. First, set the clean text (without Markdown markers) to the cell
+                        var cleanTextBuilder = new StringBuilder();
+                        foreach (var seg in segments)
+                        {
+                            cleanTextBuilder.Append(seg.Text);
+                        }
+                        activeSheetCell.Value2 = cleanTextBuilder.ToString();
+
+                        // 2. Apply formatting to each segment
+                        int currentIndex = 1; // Excel's Characters indexing is 1-based
+                        foreach (var seg in segments)
+                        {
+                            int len = seg.Text.Length;
+                            if (len > 0)
+                            {
+                                var chars = activeSheetCell.Characters[currentIndex, len];
+                                if (seg.IsBold)
+                                {
+                                    chars.Font.Bold = true;
+                                }
+                                if (seg.IsItalic)
+                                {
+                                    chars.Font.Italic = true;
+                                }
+                                if (seg.IsStrikeThrough)
+                                {
+                                    chars.Font.Strikethrough = true;
+                                }
+
+                                currentIndex += len;
+                            }
+                        }
+                    }
+
+                    // Set cell alignment
                     switch (cell.Alignment)
                     {
                         case Alignment.Undefined:
