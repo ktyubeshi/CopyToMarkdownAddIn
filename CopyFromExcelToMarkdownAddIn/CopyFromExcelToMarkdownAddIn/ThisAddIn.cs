@@ -97,8 +97,97 @@ namespace CopyFromExcelToMarkdownAddIn
                 return;
             }
 
-            var table = new TableParser().Parse(new GridParser().Parse(text));
+            // Parse the Markdown document into blocks
+            var blocks = new MarkdownDocumentParser().Parse(text);
             var activeSheet = (Worksheet)Application.ActiveSheet;
+            var currentRow = range.Row;
+
+            // Process each block
+            foreach (var block in blocks)
+            {
+                if (block is TextBlock textBlock)
+                {
+                    // Write text block to a single cell in the left column
+                    WriteTextBlock(textBlock, activeSheet, currentRow, range.Column);
+                    currentRow++;
+                }
+                else if (block is TableBlock tableBlock)
+                {
+                    // Write table block to cells
+                    var rowsWritten = WriteTableBlock(tableBlock, activeSheet, currentRow, range.Column);
+                    currentRow += rowsWritten;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes a text block to a single cell.
+        /// </summary>
+        /// <param name="textBlock">The text block to write.</param>
+        /// <param name="sheet">The worksheet to write to.</param>
+        /// <param name="row">The row index to write to.</param>
+        /// <param name="column">The column index to write to.</param>
+        private void WriteTextBlock(TextBlock textBlock, Worksheet sheet, int row, int column)
+        {
+            var cell = (Range)sheet.Cells[row, column];
+            var text = textBlock.Text;
+
+            // Check if the text contains Markdown formatting markers
+            if (!System.Text.RegularExpressions.Regex.IsMatch(text, @"(\*|_|~|`)"))
+            {
+                cell.Value2 = text;
+            }
+            else
+            {
+                // Parse Markdown formatting
+                var segments = MarkdownInlineParser.Parse(text);
+
+                // 1. First, set the clean text (without Markdown markers) to the cell
+                var cleanTextBuilder = new StringBuilder();
+                foreach (var seg in segments)
+                {
+                    cleanTextBuilder.Append(seg.Text);
+                }
+                cell.Value2 = cleanTextBuilder.ToString();
+
+                // 2. Apply formatting to each segment
+                int currentIndex = 1; // Excel's Characters indexing is 1-based
+                foreach (var seg in segments)
+                {
+                    int len = seg.Text.Length;
+                    if (len > 0)
+                    {
+                        var chars = cell.Characters[currentIndex, len];
+                        if (seg.IsBold)
+                        {
+                            chars.Font.Bold = true;
+                        }
+                        if (seg.IsItalic)
+                        {
+                            chars.Font.Italic = true;
+                        }
+                        if (seg.IsStrikeThrough)
+                        {
+                            chars.Font.Strikethrough = true;
+                        }
+
+                        currentIndex += len;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes a table block to cells.
+        /// </summary>
+        /// <param name="tableBlock">The table block to write.</param>
+        /// <param name="sheet">The worksheet to write to.</param>
+        /// <param name="startRow">The starting row index.</param>
+        /// <param name="startColumn">The starting column index.</param>
+        /// <returns>The number of rows written.</returns>
+        private int WriteTableBlock(TableBlock tableBlock, Worksheet sheet, int startRow, int startColumn)
+        {
+            var table = tableBlock.TableData;
 
             for (var i = 0; i < table.Rows.Count; i++)
             {
@@ -106,7 +195,7 @@ namespace CopyFromExcelToMarkdownAddIn
                 for (var j = 0; j < row.Count; j++)
                 {
                     var cell = row[j];
-                    var activeSheetCell =  (Range)activeSheet.Cells[range.Row + i, range.Column + j];
+                    var activeSheetCell = (Range)sheet.Cells[startRow + i, startColumn + j];
 
                     // Replace <br> tags with newlines
                     var baseText = cell.Value.Replace("<br>", "\n").Replace("<br/>", "\n");
@@ -176,6 +265,8 @@ namespace CopyFromExcelToMarkdownAddIn
                     }
                 }
             }
+
+            return table.Rows.Count;
         }
 
         /// <summary>

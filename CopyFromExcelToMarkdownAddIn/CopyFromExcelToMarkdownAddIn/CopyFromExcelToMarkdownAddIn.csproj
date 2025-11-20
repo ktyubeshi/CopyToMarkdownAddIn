@@ -180,9 +180,13 @@
     <Compile Include="Grid.cs" />
     <Compile Include="GridParser.cs" />
     <Compile Include="Alignment.cs" />
+    <Compile Include="IMarkdownBlock.cs" />
+    <Compile Include="MarkdownDocumentParser.cs" />
     <Compile Include="MarkdownInlineParser.cs" />
+    <Compile Include="TableBlock.cs" />
     <Compile Include="TableCell.cs" />
     <Compile Include="TableParser.cs" />
+    <Compile Include="TextBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
