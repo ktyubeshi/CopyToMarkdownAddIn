@@ -17,7 +17,8 @@ namespace CopyFromExcelToMarkdownAddIn
 
         public GridCell(string value)
         {
-            Value = value;
+            // Trim whitespace to correctly detect alignment markers like " :-- "
+            Value = value?.Trim() ?? string.Empty;
             if (System.Text.RegularExpressions.Regex.IsMatch(Value, "^-+$"))
             {
                 IsAlignment = true;

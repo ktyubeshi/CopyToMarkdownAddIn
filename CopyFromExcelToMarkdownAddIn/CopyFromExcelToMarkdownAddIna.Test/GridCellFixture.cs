@@ -56,5 +56,25 @@ namespace CopyFromExcelToMarkdownAddIna.Test
             Assert.Equal(Alignment.Right, new GridCell("-:").Alignment);
             Assert.Equal(Alignment.Right, new GridCell("--:").Alignment);
         }
+
+        [Fact]
+        public void IsAlignmentWithSpaces()
+        {
+            // Test that alignment markers with surrounding spaces are correctly detected
+            Assert.True(new GridCell(" :-- ").IsAlignment);
+            Assert.True(new GridCell(" :-: ").IsAlignment);
+            Assert.True(new GridCell(" --: ").IsAlignment);
+            Assert.True(new GridCell("  --  ").IsAlignment);
+        }
+
+        [Fact]
+        public void AlignmentTypeWithSpaces()
+        {
+            // Test that alignment type is correctly determined even with spaces
+            Assert.Equal(Alignment.Left, new GridCell(" :-- ").Alignment);
+            Assert.Equal(Alignment.Center, new GridCell(" :-: ").Alignment);
+            Assert.Equal(Alignment.Right, new GridCell(" --: ").Alignment);
+            Assert.Equal(Alignment.Undefined, new GridCell("  --  ").Alignment);
+        }
     }
 }
