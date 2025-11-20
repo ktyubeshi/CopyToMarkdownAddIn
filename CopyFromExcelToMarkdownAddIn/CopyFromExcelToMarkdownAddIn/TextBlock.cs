@@ -18,5 +18,14 @@ namespace CopyFromExcelToMarkdownAddIn
         {
             Text = text;
         }
+
+        /// <summary>
+        /// Converts the block to a Markdown string.
+        /// </summary>
+        /// <returns>The Markdown representation of the block.</returns>
+        public string ToMarkdown()
+        {
+            return Text;
+        }
     }
 }

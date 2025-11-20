@@ -179,6 +179,7 @@
     <Compile Include="GridCell.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="GridParser.cs" />
+    <Compile Include="RangeParser.cs" />
     <Compile Include="Alignment.cs" />
     <Compile Include="IMarkdownBlock.cs" />
     <Compile Include="MarkdownDocumentParser.cs" />
@@ -200,6 +201,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="CopyFromExcelToMarkdownAddIn_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -231,11 +233,19 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
+    <ManifestKeyFile>CopyFromExcelToMarkdownAddIn_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>1ABFA35FBFCF078239D0D85A00F77D63C7AD7843</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <!--
+  <PropertyGroup>
     <ManifestKeyFile>nuits.jp.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>CE161AFC653C6B72C41350B96663BB1E91E173DC</ManifestCertificateThumbprint>
   </PropertyGroup>
+  -->
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- Include additional build rules for an Office application add-in. -->

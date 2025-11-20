@@ -9,10 +9,6 @@ namespace CopyFromExcelToMarkdownAddIn
     public partial class ThisAddIn
     {
         /// <summary>
-        /// Minimum required select the number of rows.
-        /// </summary>
-        private const int MinRowCount = 3;
-        /// <summary>
         /// Alignment Undefined
         /// </summary>
         private const int AlignmentUndefined = 1;
@@ -291,71 +287,27 @@ namespace CopyFromExcelToMarkdownAddIn
                 MessageBox.Show(Properties.Resources.UnselectedErrorMessage);
                 return;
             }
-            
-            var rowsCount = range.Rows.Count;
-            if (rowsCount < MinRowCount)
-            {
-                MessageBox.Show(Properties.Resources.UnselectedErrorMessage);
-                return;
-            }
 
-            var columnsCount = range.Count / rowsCount;
-            var resultBuffer = new StringBuilder();
-            var separatorBuffer = new StringBuilder();
-            for (int x = 1; x <= columnsCount; x++)
+            try
             {
-                var cell = (Range)range.Cells[1, x];
+                var parser = new RangeParser();
+                var blocks = parser.Parse(range);
 
-                resultBuffer.Append("|");
-                resultBuffer.Append(FormatText(cell));
-                switch ((int)cell.HorizontalAlignment)
+                var sb = new StringBuilder();
+                foreach (var block in blocks)
                 {
-                    case AlignmentLeft:
-                        separatorBuffer.Append("|:--");
-                        break;
-                    case AlignmentCenter:
-                        separatorBuffer.Append("|:-:");
-                        break;
-                    case AlignmentRight:
-                        separatorBuffer.Append("|--:");
-                        break;
-                    default:
-                        separatorBuffer.Append("|--");
-                        break;
+                    sb.AppendLine(block.ToMarkdown());
+                    sb.AppendLine(); // Ensure separation between blocks
+                }
+
+                if (sb.Length > 0)
+                {
+                    Clipboard.SetText(sb.ToString());
                 }
             }
-            // Partition of the header and data lines.
-            // Process only after the first line.
-            resultBuffer.Append("|");
-            resultBuffer.Append(Environment.NewLine);
-            separatorBuffer.Append("|");
-            separatorBuffer.Append(Environment.NewLine);
-            resultBuffer.Append(separatorBuffer);
-
-            for (int y = 2; y <= rowsCount; y++)
+            catch (Exception ex)
             {
-                for (int x = 1; x <= columnsCount; x++)
-                {
-                    var cell = (Range)range.Cells[y, x];
-
-                    resultBuffer.Append("|");
-                    resultBuffer.Append(FormatText(cell));
-                }
-                resultBuffer.Append("|");
-                resultBuffer.Append(Environment.NewLine);
-            }
-            Clipboard.SetText(resultBuffer.ToString());
-        }
-
-        private static string FormatText(Range range)
-        {
-            if (range == null || range.Text == null)
-            {
-                return string.Empty;
-            }
-            else
-            {
-                return range.Text.Replace("\n", "<br>");
+                MessageBox.Show("Error copying to Markdown: " + ex.Message);
             }
         }
 
